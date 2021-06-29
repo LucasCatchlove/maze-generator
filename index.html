@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maze Solver</title>
+
+    <style>
+        body {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #maze {
+            border: black 1px solid;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        #maze-container {
+            margin-top: 2%;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #maze div {
+            text-align: center;
+            font-size: 9px;
+        }
+
+        button {
+            margin-top: 2%; 
+        }
+    </style>
+
+</head>
+
+<body>
+    <h1>Aldous-Broder Maze Generator</h1>
+    <div id="maze-container">
+        <div id="maze"></div>
+    </div>
+    <button onclick="mazeSolverDFS(0, 0)">Solve Maze with DFS</button>
+   
+    <script src="app.js"></script>
+</body>
+
+</html>
