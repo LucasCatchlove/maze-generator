@@ -14,7 +14,7 @@ node_modules
 lib-cov
 
 ##VS code
-/.vscode
+.vscode/
 
 ## coffeescript
 lib/*.js
