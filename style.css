@@ -28,16 +28,13 @@ canvas {
   border-radius: 5px;
   border-style: none;
   box-sizing: border-box;
-  text-overflow: clip;
   color: #fff;
   height: 40px;
   font-size: 1em;
-  line-height: 1.5;
   overflow: hidden;
   margin: auto 1%;
   padding: 5px 20px;
   text-align: center;
-  transform: translate3d(0, 0, 0);
   transition: all .3s;
 }
 
@@ -47,9 +44,9 @@ canvas {
   opacity: 1;
 }
 
-#controls button:hover:after {
+/* #controls button:hover:after {
   opacity: .5;
-}
+} */
 
 #controls button:disabled {
   opacity: 0.4;

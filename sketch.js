@@ -1,6 +1,6 @@
 let grid = []
 let cells = []
-let rows = 17, cols = 17
+let rows =  17, cols = 17
 let side = 40
 
 let current
@@ -18,9 +18,6 @@ let ppBtn
 let stepBtn
 let solveBtn
 let newMazeBtn
-
-
-
 
 
 function setup() {
@@ -41,7 +38,7 @@ function setup() {
   current = grid[0]
   current.visited = true
 
-  grid.forEach(cell => cell.show())
+  grid.forEach(cell => cell.display())
 
   ppBtn = document.getElementById('playpause-btn')
   ppBtn.addEventListener('click', pause)
@@ -133,6 +130,7 @@ function solve() {
     startingJ = floor(random(0, floor(cols / 1.5)))
     endingI = floor(random(floor(rows / 4), rows))
     endingJ = floor(random(floor(cols / 4), cols))
+    
   }
   beginSolving = true
   mazeSolved = false
@@ -162,7 +160,7 @@ function draw() {
 
 function recursiveBacktracker() {
   if (!mazeSolved)
-    grid.forEach(cell => cell.show())
+    grid.forEach(cell => cell.display())
 
   let next = current.checkAdjacentCells()
 
@@ -189,7 +187,7 @@ function recursiveBacktracker() {
     ppBtn.disabled = true
     stepBtn.disabled = true
 
-    grid.forEach(cell => cell.show())
+    grid.forEach(cell => cell.display())
   }
 }
 
@@ -197,17 +195,17 @@ function recursiveBacktracker() {
 
 function DFS() {
   if (!mazeSolved && beginSolving) {
-    grid.forEach(cell => cell.show())
+    grid.forEach(cell => cell.display())
     let next = current.findPassage()
 
-    if (current.i == endingI && current.j == endingJ) {
+    if (current.this.i == endingI && current.this.j == endingJ) {
       noLoop()
       mazeSolved = true
       ppBtn.disabled = true
       stepBtn.disabled = true
       solveBtn.disabled = false
       newMazeBtn.disabled = false
-      grid.forEach(cell => cell.show())
+      grid.forEach(cell => cell.display())
     }
 
     else if (next) {
@@ -233,18 +231,20 @@ function Cell(i, j) {
   this.solnMember = false
   this.walls = [true, true, true, true]
 
+}
 
-  this.show = function () {
+
+ Cell.prototype.display = function () {
 
     if (!mazeGenerated) {
       noStroke()
       fill(255)
-      rect(i * side, j * side, side, side)
+      rect(this.i * side, this.j * side, side, side)
 
       if (current.i == this.i && current.j == this.j)
         if (current != grid[0]) {
           fill(color('#ff7f7f'))
-          ellipse(side / 2 + i * side, side / 2 + j * side, side / 1.75, side / 1.75)
+          ellipse(side / 2 + this.i * side, side / 2 + this.j * side, side / 1.75, side / 1.75)
         }
 
     }
@@ -259,17 +259,17 @@ function Cell(i, j) {
         else
           fill('#03a9f4')
 
-        ellipse(side / 2 + i * side, side / 2 + j * side, side / 3.5, side / 3.5)
+        ellipse(side / 2 + this.i * side, side / 2 + this.j * side, side / 3.5, side / 3.5)
       }
       else {
         noStroke()
         fill(255)
-        rect(i * side, j * side, side, side)
+        rect(this.i * side, this.j * side, side, side)
       }
 
     }
 
-    if (((i == startingI && j == startingJ) || (i == endingI && j == endingJ)) && mazeGenerated) {
+    if (((this.i == startingI && this.j == startingJ) || (this.i == endingI && this.j == endingJ)) && mazeGenerated) {
 
       if (mazeSolved) {
         noStroke()
@@ -278,42 +278,42 @@ function Cell(i, j) {
       else
         fill('#1e88e5')
 
-      ellipse(side / 2 + i * side, side / 2 + j * side, side / 1.75, side / 1.75)
+      ellipse(side / 2 + this.i * side, side / 2 + this.j * side, side / 1.75, side / 1.75)
 
     }
 
     stroke(150)
 
     if ((this.walls[0] || grid[index(this.i - 1, this.j)].walls[1]) && this.i != 0) {
-      line(i * side, j * side, i * side, (j + 1) * side)
-      line(i * side, j * side, i * side, (j + 1) * side)
+      line(this.i * side, this.j * side, this.i * side, (this.j + 1) * side)
+      line(this.i * side, this.j * side, this.i * side, (this.j + 1) * side)
     }
 
     if ((this.walls[1] || grid[index(this.i + 1, this.j)].walls[0]) && this.i != rows - 1) {
-      line((i + 1) * side, j * side, (i + 1) * side, (j + 1) * side)
-      line((i + 1) * side, j * side, (i + 1) * side, (j + 1) * side)
+      line((this.i + 1) * side, this.j * side, (this.i + 1) * side, (this.j + 1) * side)
+      line((this.i + 1) * side, this.j * side, (this.i + 1) * side, (this.j + 1) * side)
     }
 
     if ((this.walls[2] || grid[index(this.i, this.j + 1)].walls[3]) && this.j != cols - 1) {
-      line(i * side, (j + 1) * side, (i + 1) * side, (j + 1) * side)
-      line(i * side, (j + 1) * side, (i + 1) * side, (j + 1) * side)
+      line(this.i * side, (this.j + 1) * side, (this.i + 1) * side, (this.j + 1) * side)
+      line(this.i * side, (this.j + 1) * side, (this.i + 1) * side, (this.j + 1) * side)
     }
 
     if ((this.walls[3] || grid[index(this.i, this.j - 1)].walls[2]) && this.j != 0) {
-      line(i * side, j * side, (i + 1) * side, j * side)
-      line(i * side, j * side, (i + 1) * side, j * side)
+      line(this.i * side, this.j * side, (this.i + 1) * side, this.j * side)
+      line(this.i * side, this.j * side, (this.i + 1) * side, this.j * side)
     }
   }
 
 
-  this.checkAdjacentCells = function () {
+  Cell.prototype.checkAdjacentCells = function () {
 
     let adjacent = []
 
-    let N = grid[index(i - 1, j)]
-    let S = grid[index(i + 1, j)]
-    let E = grid[index(i, j + 1)]
-    let W = grid[index(i, j - 1)]
+    let N = grid[index(this.i - 1, this.j)]
+    let S = grid[index(this.i + 1, this.j)]
+    let E = grid[index(this.i, this.j + 1)]
+    let W = grid[index(this.i, this.j - 1)]
 
     if (N && !N.visited)
       adjacent.push(N)
@@ -336,12 +336,12 @@ function Cell(i, j) {
   }
 
 
-  this.findPassage = function () {
+  Cell.prototype.findPassage = function () {
 
-    let N = grid[index(i - 1, j)]
-    let S = grid[index(i + 1, j)]
-    let E = grid[index(i, j + 1)]
-    let W = grid[index(i, j - 1)]
+    let N = grid[index(this.this.i - 1, this.this.j)]
+    let S = grid[index(this.this.i + 1, this.this.j)]
+    let E = grid[index(this.this.i, this.this.j + 1)]
+    let W = grid[index(this.this.i, this.this.j - 1)]
 
     if (N && !N.visited && !this.walls[0])
       return N
@@ -358,7 +358,7 @@ function Cell(i, j) {
     else
       return null
   }
-}
+
 
 
 
@@ -366,7 +366,7 @@ function index(i, j) {
   if (i < 0 || j < 0 || i > rows - 1 || j > cols - 1)
     return -1
   else
-    return i * rows + j
+    return i*rows + j
 }
 
 
