@@ -1,7 +1,7 @@
 let grid = []
 let cells = []
-const rows =  17, cols = 17
-const side = 40
+const rows = 20, cols = 20
+const side = 30
 
 let current
 let startingI
@@ -22,14 +22,15 @@ const newMazeButton = document.getElementById('newmaze-btn')
 
 function setup() {
 
-  const canvas = createCanvas((rows * side), (cols * side))
+  const canvas = createCanvas((cols * side), (rows * side))
   canvas.parent('canvas-container')
-  frameRate(24)
+  frameRate(60)
 
-  startingI = floor(random(0, floor(rows / 3)))
-  startingJ = floor(random(0, floor(cols / 3)))
-  endingI = floor(random(floor(rows / 3), rows))
-  endingJ = floor(random(floor(cols / 3), cols))
+  startingI = floor(random(0, rows))
+  startingJ = floor(random(0, cols))
+  endingI = floor(random(0, rows))
+  endingJ = floor(random(0, cols))
+
 
   for (let i = 0; i < rows; i++)
     for (let j = 0; j < cols; j++)
@@ -49,7 +50,7 @@ function setup() {
   solveButton.addEventListener('click', solve)
   solveButton.disabled = true
 
-  newMazeButton .addEventListener('click', newMaze)
+  newMazeButton.addEventListener('click', newMaze)
 }
 
 
@@ -91,21 +92,21 @@ function newMaze() {
   stepButton.disabled = false
 
   if (mazeGenerated) {
-      if (!mazeSolved)
-          newMazeButton.disabled = false
+    if (!mazeSolved)
+      newMazeButton.disabled = false
 
-      playPauseButton.disabled = false
-      stepButton.disabled = false
-      solveButton.disabled = true
-      mazeSolved = false
+    playPauseButton.disabled = false
+    stepButton.disabled = false
+    solveButton.disabled = true
+    mazeSolved = false
   }
 
   mazeGenerated = false
 
   grid.forEach(cell => {
-      cell.visited = false
-      cell.solutionPathMember = false
-      cell.walls = [true, true, true, true]
+    cell.visited = false
+    cell.solutionPathMember = false
+    cell.walls = [true, true, true, true]
   })
 
   playPauseButton.innerHTML = "pause"
@@ -121,21 +122,21 @@ function solve() {
   solveButton.disabled = true
 
   if (mazeSolved) {
-      playPauseButton.disabled = false
-      stepButton.disabled = false
+    playPauseButton.disabled = false
+    stepButton.disabled = false
 
-      startingI = floor(random(0, floor(rows / 1.25)))
-      startingJ = floor(random(0, floor(cols / 1.5)))
-      endingI = floor(random(floor(rows / 4), rows))
-      endingJ = floor(random(floor(cols / 4), cols))
+    startingI = floor(random(0, rows))
+    startingJ = floor(random(0, cols))
+    endingI = floor(random(0, rows))
+    endingJ = floor(random(0, cols))
 
   }
   beginSolving = true
   mazeSolved = false
 
   grid.forEach(cell => {
-      cell.visited = false
-      cell.solutionPathMember = false
+    cell.visited = false
+    cell.solutionPathMember = false
   })
 
   current = grid[index(startingI, startingJ)]
@@ -201,7 +202,7 @@ function dfsSolver() {
       playPauseButton.disabled = true
       stepButton.disabled = true
       solveButton.disabled = false
-      newMazeButton .disabled = false
+      newMazeButton.disabled = false
       grid.forEach(cell => cell.display())
     }
 
@@ -230,132 +231,132 @@ function Cell(i, j) {
 
 
 
- Cell.prototype.display = function () {
+Cell.prototype.display = function () {
 
-    if (!mazeGenerated) {
+  if (!mazeGenerated) {
+    noStroke()
+    fill(255)
+    rect(this.i * side, this.j * side, side, side)
+
+    if (current.i == this.i && current.j == this.j)
+      if (current != grid[0]) {
+        fill(color('#ff7f7f'))
+        ellipse(side / 2 + this.i * side, side / 2 + this.j * side, side / 1.75, side / 1.75)
+      }
+
+  }
+
+  else {
+
+    if (this.solutionPathMember) {
+      noStroke()
+
+      if (mazeSolved)
+        fill('#1e88e5')
+      else
+        fill('#03a9f4')
+
+      ellipse(side / 2 + this.i * side, side / 2 + this.j * side, side / 3.5, side / 3.5)
+    }
+    else {
       noStroke()
       fill(255)
       rect(this.i * side, this.j * side, side, side)
-
-      if (current.i == this.i && current.j == this.j)
-        if (current != grid[0]) {
-          fill(color('#ff7f7f'))
-          ellipse(side / 2 + this.i * side, side / 2 + this.j * side, side / 1.75, side / 1.75)
-        }
-
     }
 
-    else {
-
-      if (this.solutionPathMember) {
-        noStroke()
-
-        if (mazeSolved)
-          fill('#1e88e5')
-        else
-          fill('#03a9f4')
-
-        ellipse(side / 2 + this.i * side, side / 2 + this.j * side, side / 3.5, side / 3.5)
-      }
-      else {
-        noStroke()
-        fill(255)
-        rect(this.i * side, this.j * side, side, side)
-      }
-
-    }
-
-    if (((this.i == startingI && this.j == startingJ) || (this.i == endingI && this.j == endingJ)) && mazeGenerated) {
-
-      if (mazeSolved) {
-        noStroke()
-        fill('#1e88e5')
-      }
-      else
-        fill('#1e88e5')
-
-      ellipse(side / 2 + this.i * side, side / 2 + this.j * side, side / 1.75, side / 1.75)
-
-    }
-
-    stroke(150)
-
-    if ((this.walls[0] || grid[index(this.i - 1, this.j)].walls[1]) && this.i != 0) {
-      line(this.i * side, this.j * side, this.i * side, (this.j + 1) * side)
-      line(this.i * side, this.j * side, this.i * side, (this.j + 1) * side)
-    }
-
-    if ((this.walls[1] || grid[index(this.i + 1, this.j)].walls[0]) && this.i != rows - 1) {
-      line((this.i + 1) * side, this.j * side, (this.i + 1) * side, (this.j + 1) * side)
-      line((this.i + 1) * side, this.j * side, (this.i + 1) * side, (this.j + 1) * side)
-    }
-
-    if ((this.walls[2] || grid[index(this.i, this.j + 1)].walls[3]) && this.j != cols - 1) {
-      line(this.i * side, (this.j + 1) * side, (this.i + 1) * side, (this.j + 1) * side)
-      line(this.i * side, (this.j + 1) * side, (this.i + 1) * side, (this.j + 1) * side)
-    }
-
-    if ((this.walls[3] || grid[index(this.i, this.j - 1)].walls[2]) && this.j != 0) {
-      line(this.i * side, this.j * side, (this.i + 1) * side, this.j * side)
-      line(this.i * side, this.j * side, (this.i + 1) * side, this.j * side)
-    }
   }
 
+  if (((this.i == startingI && this.j == startingJ) || (this.i == endingI && this.j == endingJ)) && mazeGenerated) {
 
-
-  Cell.prototype.checkAdjacentCells = function () {
-
-    let adjacent = []
-
-    let N = grid[index(this.i - 1, this.j)]
-    let S = grid[index(this.i + 1, this.j)]
-    let E = grid[index(this.i,     this.j + 1)]
-    let W = grid[index(this.i,     this.j - 1)]
-
-    if (N && !N.visited)
-      adjacent.push(N)
-
-    if (S && !S.visited)
-      adjacent.push(S)
-
-    if (E && !E.visited)
-      adjacent.push(E)
-
-    if (W && !W.visited)
-      adjacent.push(W)
-
-    if (adjacent.length > 0) {
-      let rand = floor(random(0, adjacent.length))
-      return adjacent[rand]
+    if (mazeSolved) {
+      noStroke()
+      fill('#1e88e5')
     }
     else
-      return null
+      fill('#1e88e5')
+
+    ellipse(side / 2 + this.i * side, side / 2 + this.j * side, side / 1.75, side / 1.75)
+
   }
 
+  stroke(150)
 
-
-  Cell.prototype.findPassage = function () {
-
-    let N = grid[index(this.i - 1, this.j)]
-    let S = grid[index(this.i + 1, this.j)]
-    let E = grid[index(this.i,     this.j + 1)]
-    let W = grid[index(this.i,     this.j - 1)]
-
-    if (N && !N.visited && !this.walls[0])
-      return N
-
-    else if (S && !S.visited && !this.walls[1])
-      return S
-
-    else if (E && !E.visited && !this.walls[2])
-      return E
-
-    else if (W && !W.visited && !this.walls[3])
-      return W
-
-    else
-      return null
+  if ((this.walls[0] || grid[index(this.i - 1, this.j)].walls[1]) && this.i != 0) {
+    line(this.i * side, this.j * side, this.i * side, (this.j + 1) * side)
+    line(this.i * side, this.j * side, this.i * side, (this.j + 1) * side)
   }
+
+  if ((this.walls[1] || grid[index(this.i + 1, this.j)].walls[0]) && this.i != rows - 1) {
+    line((this.i + 1) * side, this.j * side, (this.i + 1) * side, (this.j + 1) * side)
+    line((this.i + 1) * side, this.j * side, (this.i + 1) * side, (this.j + 1) * side)
+  }
+
+  if ((this.walls[2] || grid[index(this.i, this.j + 1)].walls[3]) && this.j != cols - 1) {
+    line(this.i * side, (this.j + 1) * side, (this.i + 1) * side, (this.j + 1) * side)
+    line(this.i * side, (this.j + 1) * side, (this.i + 1) * side, (this.j + 1) * side)
+  }
+
+  if ((this.walls[3] || grid[index(this.i, this.j - 1)].walls[2]) && this.j != 0) {
+    line(this.i * side, this.j * side, (this.i + 1) * side, this.j * side)
+    line(this.i * side, this.j * side, (this.i + 1) * side, this.j * side)
+  }
+}
+
+
+
+Cell.prototype.checkAdjacentCells = function () {
+
+  let adjacent = []
+
+  let N = grid[index(this.i - 1, this.j)]
+  let S = grid[index(this.i + 1, this.j)]
+  let E = grid[index(this.i, this.j + 1)]
+  let W = grid[index(this.i, this.j - 1)]
+
+  if (N && !N.visited)
+    adjacent.push(N)
+
+  if (S && !S.visited)
+    adjacent.push(S)
+
+  if (E && !E.visited)
+    adjacent.push(E)
+
+  if (W && !W.visited)
+    adjacent.push(W)
+
+  if (adjacent.length > 0) {
+    let rand = floor(random(0, adjacent.length))
+    return adjacent[rand]
+  }
+  else
+    return null
+}
+
+
+
+Cell.prototype.findPassage = function () {
+
+  let N = grid[index(this.i - 1, this.j)]
+  let S = grid[index(this.i + 1, this.j)]
+  let E = grid[index(this.i, this.j + 1)]
+  let W = grid[index(this.i, this.j - 1)]
+
+  if (N && !N.visited && !this.walls[0])
+    return N
+
+  else if (S && !S.visited && !this.walls[1])
+    return S
+
+  else if (E && !E.visited && !this.walls[2])
+    return E
+
+  else if (W && !W.visited && !this.walls[3])
+    return W
+
+  else
+    return null
+}
 
 
 
@@ -363,7 +364,7 @@ function index(i, j) {
   if (i < 0 || j < 0 || i > rows - 1 || j > cols - 1)
     return -1
   else
-    return i*rows + j
+    return i * cols + j
 }
 
 
@@ -384,7 +385,7 @@ function removeWalls(current, next) {
     current.walls[2] = false
   }
 
-  else {
+  else if (next.j < current.j) {
     next.walls[2] = false
     current.walls[3] = false
   }
