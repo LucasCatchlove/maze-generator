@@ -44,10 +44,6 @@ canvas {
   opacity: 1;
 }
 
-/* #controls button:hover:after {
-  opacity: .5;
-} */
-
 #controls button:disabled {
   opacity: 0.4;
   cursor: not-allowed;

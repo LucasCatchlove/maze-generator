@@ -1,7 +1,7 @@
 let grid = []
 let cells = []
-let rows =  17, cols = 17
-let side = 40
+const rows =  17, cols = 17
+const side = 40
 
 let current
 let startingI
@@ -14,17 +14,17 @@ let mazeSolved = false
 let beginSolving = false
 let beginGeneration = false
 
-let ppBtn
-let stepBtn
-let solveBtn
-let newMazeBtn
+const playPauseButton = document.getElementById('playpause-btn')
+const stepButton = document.getElementById('step-btn')
+const solveButton = document.getElementById('solve-btn')
+const newMazeButton = document.getElementById('newmaze-btn')
 
 
 function setup() {
 
-  let canvas = createCanvas((rows * side), (cols * side))
+  const canvas = createCanvas((rows * side), (cols * side))
   canvas.parent('canvas-container')
-  frameRate(20)
+  frameRate(24)
 
   startingI = floor(random(0, floor(rows / 3)))
   startingJ = floor(random(0, floor(cols / 3)))
@@ -40,45 +40,42 @@ function setup() {
 
   grid.forEach(cell => cell.display())
 
-  ppBtn = document.getElementById('playpause-btn')
-  ppBtn.addEventListener('click', pause)
-  ppBtn.disabled = true
+  playPauseButton.addEventListener('click', pause)
+  playPauseButton.disabled = true
 
-  stepBtn = document.getElementById('step-btn')
-  stepBtn.addEventListener('click', step)
-  stepBtn.disabled = true
+  stepButton.addEventListener('click', step)
+  stepButton.disabled = true
 
-  solveBtn = document.getElementById('solve-btn')
-  solveBtn.addEventListener('click', solve)
-  solveBtn.disabled = true
+  solveButton.addEventListener('click', solve)
+  solveButton.disabled = true
 
-  newMazeBtn = document.getElementById('newmaze-btn')
-  newMazeBtn.addEventListener('click', newMaze)
+  newMazeButton .addEventListener('click', newMaze)
 }
+
 
 
 function pause() {
   noLoop()
-  ppBtn.innerHTML = "play"
-  ppBtn.removeEventListener('click', pause)
-  ppBtn.addEventListener('click', play)
+  playPauseButton.innerHTML = "play"
+  playPauseButton.removeEventListener('click', pause)
+  playPauseButton.addEventListener('click', play)
 }
 
 
 
 function play() {
   loop()
-  ppBtn.innerHTML = "pause"
-  ppBtn.removeEventListener('click', play)
-  ppBtn.addEventListener('click', pause)
+  playPauseButton.innerHTML = "pause"
+  playPauseButton.removeEventListener('click', play)
+  playPauseButton.addEventListener('click', pause)
 
 }
 
 
 
 function step() {
-  ppBtn.innerHTML = "play"
-  ppBtn.addEventListener('click', play)
+  playPauseButton.innerHTML = "play"
+  playPauseButton.addEventListener('click', play)
   noLoop()
   draw()
 }
@@ -88,29 +85,30 @@ function step() {
 function newMaze() {
   cells = []
   current = grid[0]
-  solveBtn.innerHTML = "solve maze"
+  solveButton.innerHTML = "solve maze"
   beginGeneration = true
-  ppBtn.disabled = false
-  stepBtn.disabled = false
-  if (mazeGenerated) {
-    if (!mazeSolved)
-      newMazeBtn.disabled = false
+  playPauseButton.disabled = false
+  stepButton.disabled = false
 
-    ppBtn.disabled = false
-    stepBtn.disabled = false
-    solveBtn.disabled = true
-    mazeSolved = false
+  if (mazeGenerated) {
+      if (!mazeSolved)
+          newMazeButton.disabled = false
+
+      playPauseButton.disabled = false
+      stepButton.disabled = false
+      solveButton.disabled = true
+      mazeSolved = false
   }
 
   mazeGenerated = false
 
   grid.forEach(cell => {
-    cell.visited = false
-    cell.solnMember = false
-    cell.walls = [true, true, true, true]
+      cell.visited = false
+      cell.solutionPathMember = false
+      cell.walls = [true, true, true, true]
   })
 
-  ppBtn.innerHTML = "pause"
+  playPauseButton.innerHTML = "pause"
   loop()
 
 }
@@ -118,47 +116,46 @@ function newMaze() {
 
 
 function solve() {
-  ppBtn.disabled = false
-  stepBtn.disabled = false
-  solveBtn.disabled = true
+  playPauseButton.disabled = false
+  stepButton.disabled = false
+  solveButton.disabled = true
 
   if (mazeSolved) {
-    ppBtn.disabled = false
-    stepBtn.disabled = false
+      playPauseButton.disabled = false
+      stepButton.disabled = false
 
-    startingI = floor(random(0, floor(rows / 1.25)))
-    startingJ = floor(random(0, floor(cols / 1.5)))
-    endingI = floor(random(floor(rows / 4), rows))
-    endingJ = floor(random(floor(cols / 4), cols))
-    
+      startingI = floor(random(0, floor(rows / 1.25)))
+      startingJ = floor(random(0, floor(cols / 1.5)))
+      endingI = floor(random(floor(rows / 4), rows))
+      endingJ = floor(random(floor(cols / 4), cols))
+
   }
   beginSolving = true
   mazeSolved = false
 
   grid.forEach(cell => {
-    cell.visited = false
-    cell.solnMember = false
+      cell.visited = false
+      cell.solutionPathMember = false
   })
 
   current = grid[index(startingI, startingJ)]
   current.visited = true
-  current.solnMember = true
+  current.solutionPathMember = true
   mazeSolved = false
-  solveBtn.innerHTML = "solve for new points"
-  ppBtn.innerHTML = "pause"
+  solveButton.innerHTML = "solve for new points"
+  playPauseButton.innerHTML = "pause"
   loop()
 }
 
 
 
 function draw() {
-  
-  beginGeneration ? (!mazeGenerated ? recursiveBacktracker() : DFS()) : null
+  beginGeneration ? (!mazeGenerated ? recursiveBacktrackerGenerator() : dfsSolver()) : null
 }
 
 
 
-function recursiveBacktracker() {
+function recursiveBacktrackerGenerator() {
   if (!mazeSolved)
     grid.forEach(cell => cell.display())
 
@@ -181,11 +178,11 @@ function recursiveBacktracker() {
     beginSolving = false
 
     current.visited = true
-    current.solnMember = true
+    current.solutionPathMember = true
 
-    solveBtn.disabled = false
-    ppBtn.disabled = true
-    stepBtn.disabled = true
+    solveButton.disabled = false
+    playPauseButton.disabled = true
+    stepButton.disabled = true
 
     grid.forEach(cell => cell.display())
   }
@@ -193,45 +190,44 @@ function recursiveBacktracker() {
 
 
 
-function DFS() {
+function dfsSolver() {
   if (!mazeSolved && beginSolving) {
     grid.forEach(cell => cell.display())
     let next = current.findPassage()
 
-    if (current.this.i == endingI && current.this.j == endingJ) {
+    if (current.i == endingI && current.j == endingJ) {
       noLoop()
       mazeSolved = true
-      ppBtn.disabled = true
-      stepBtn.disabled = true
-      solveBtn.disabled = false
-      newMazeBtn.disabled = false
+      playPauseButton.disabled = true
+      stepButton.disabled = true
+      solveButton.disabled = false
+      newMazeButton .disabled = false
       grid.forEach(cell => cell.display())
     }
 
     else if (next) {
       next.visited = true
-      next.solnMember = true
+      next.solutionPathMember = true
       cells.push(current)
       current = next
     }
 
     else if (cells.length > 0) {
-      current.solnMember = false
+      current.solutionPathMember = false
       current = cells.pop()
     }
   }
 }
 
 
-
 function Cell(i, j) {
   this.i = i
   this.j = j
   this.visited = false
-  this.solnMember = false
+  this.solutionPathMember = false
   this.walls = [true, true, true, true]
-
 }
+
 
 
  Cell.prototype.display = function () {
@@ -251,7 +247,7 @@ function Cell(i, j) {
 
     else {
 
-      if (this.solnMember) {
+      if (this.solutionPathMember) {
         noStroke()
 
         if (mazeSolved)
@@ -306,14 +302,15 @@ function Cell(i, j) {
   }
 
 
+
   Cell.prototype.checkAdjacentCells = function () {
 
     let adjacent = []
 
     let N = grid[index(this.i - 1, this.j)]
     let S = grid[index(this.i + 1, this.j)]
-    let E = grid[index(this.i, this.j + 1)]
-    let W = grid[index(this.i, this.j - 1)]
+    let E = grid[index(this.i,     this.j + 1)]
+    let W = grid[index(this.i,     this.j - 1)]
 
     if (N && !N.visited)
       adjacent.push(N)
@@ -336,12 +333,13 @@ function Cell(i, j) {
   }
 
 
+
   Cell.prototype.findPassage = function () {
 
-    let N = grid[index(this.this.i - 1, this.this.j)]
-    let S = grid[index(this.this.i + 1, this.this.j)]
-    let E = grid[index(this.this.i, this.this.j + 1)]
-    let W = grid[index(this.this.i, this.this.j - 1)]
+    let N = grid[index(this.i - 1, this.j)]
+    let S = grid[index(this.i + 1, this.j)]
+    let E = grid[index(this.i,     this.j + 1)]
+    let W = grid[index(this.i,     this.j - 1)]
 
     if (N && !N.visited && !this.walls[0])
       return N
@@ -358,7 +356,6 @@ function Cell(i, j) {
     else
       return null
   }
-
 
 
 
