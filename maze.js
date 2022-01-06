@@ -6,8 +6,8 @@ const side = 30
 let current
 let startingI
 let startingJ
-let endingI
-let endingJ
+let destinationI
+let destinationJ
 
 let mazeGenerated = false
 let mazeSolved = false
@@ -28,8 +28,8 @@ function setup() {
 
   startingI = floor(random(0, rows))
   startingJ = floor(random(0, cols))
-  endingI = floor(random(0, rows))
-  endingJ = floor(random(0, cols))
+  destinationI = floor(random(0, rows))
+  destinationJ = floor(random(0, cols))
 
 
   for (let i = 0; i < rows; i++)
@@ -69,7 +69,6 @@ function play() {
   playPauseButton.innerHTML = "pause"
   playPauseButton.removeEventListener('click', play)
   playPauseButton.addEventListener('click', pause)
-
 }
 
 
@@ -111,7 +110,6 @@ function newMaze() {
 
   playPauseButton.innerHTML = "pause"
   loop()
-
 }
 
 
@@ -127,8 +125,8 @@ function solve() {
 
     startingI = floor(random(0, rows))
     startingJ = floor(random(0, cols))
-    endingI = floor(random(0, rows))
-    endingJ = floor(random(0, cols))
+    destinationI = floor(random(0, rows))
+    destinationJ = floor(random(0, cols))
 
   }
   beginSolving = true
@@ -160,8 +158,10 @@ function recursiveBacktrackerGenerator() {
   if (!mazeSolved)
     grid.forEach(cell => cell.display())
 
+  // represents an unvisited cell that is adjacent to the current 
   let next = current.checkAdjacentCells()
 
+  // if there is such a cell, visit it and set it to the current 
   if (next) {
     next.visited = true
     cells.push(current)
@@ -169,9 +169,11 @@ function recursiveBacktrackerGenerator() {
     current = next
   }
 
+  // if there is not, return to the previous cell
   else if (cells.length > 0)
     current = cells.pop()
 
+  // if there are no new cells to visit from any given visited cell, generation is complete 
   else {
     grid.forEach(cell => cell.visited = false)
     current = grid[index(startingI, startingJ)]
@@ -194,9 +196,12 @@ function recursiveBacktrackerGenerator() {
 function dfsSolver() {
   if (!mazeSolved && beginSolving) {
     grid.forEach(cell => cell.display())
+
+    // represents an unvisited cell that is reachable from the current cell
     let next = current.findPassage()
 
-    if (current.i == endingI && current.j == endingJ) {
+    // if the current cell is the destination, end the solving process
+    if (current.i == destinationI && current.j == destinationJ) {
       noLoop()
       mazeSolved = true
       playPauseButton.disabled = true
@@ -205,14 +210,14 @@ function dfsSolver() {
       newMazeButton.disabled = false
       grid.forEach(cell => cell.display())
     }
-
+    // if there is an unvisited cell reachable from the current cell, visit it and set it to the current cell
     else if (next) {
       next.visited = true
       next.solutionPathMember = true
       cells.push(current)
       current = next
     }
-
+    // if there is not, return to the previous cell
     else if (cells.length > 0) {
       current.solutionPathMember = false
       current = cells.pop()
@@ -233,6 +238,7 @@ function Cell(i, j) {
 
 Cell.prototype.display = function () {
 
+  // prints out the partially generated maze and the red circle denoting the current cell 
   if (!mazeGenerated) {
     noStroke()
     fill(255)
@@ -246,6 +252,7 @@ Cell.prototype.display = function () {
 
   }
 
+  // prints out the current state of the solution path 
   else {
 
     if (this.solutionPathMember) {
@@ -266,7 +273,8 @@ Cell.prototype.display = function () {
 
   }
 
-  if (((this.i == startingI && this.j == startingJ) || (this.i == endingI && this.j == endingJ)) && mazeGenerated) {
+  // prints out starting and destination points
+  if (((this.i == startingI && this.j == startingJ) || (this.i == destinationI && this.j == destinationJ)) && mazeGenerated) {
 
     if (mazeSolved) {
       noStroke()
@@ -281,6 +289,7 @@ Cell.prototype.display = function () {
 
   stroke(150)
 
+  // prints out maze walls 
   if ((this.walls[0] || grid[index(this.i - 1, this.j)].walls[1]) && this.i != 0) {
     line(this.i * side, this.j * side, this.i * side, (this.j + 1) * side)
     line(this.i * side, this.j * side, this.i * side, (this.j + 1) * side)
@@ -303,7 +312,7 @@ Cell.prototype.display = function () {
 }
 
 
-
+// returns an unvisited cell adjacent to the current; returns null is no such cell exists
 Cell.prototype.checkAdjacentCells = function () {
 
   let adjacent = []
@@ -334,7 +343,7 @@ Cell.prototype.checkAdjacentCells = function () {
 }
 
 
-
+// returns next adjacent, unvisited cell with no wall in between it and the current; returns null if no such cell exists
 Cell.prototype.findPassage = function () {
 
   let N = grid[index(this.i - 1, this.j)]
